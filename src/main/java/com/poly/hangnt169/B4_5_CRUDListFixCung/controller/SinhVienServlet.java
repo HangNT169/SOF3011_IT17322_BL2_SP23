@@ -11,6 +11,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,35 +29,42 @@ import java.util.List;
 })
 public class SinhVienServlet extends HttpServlet {
 
-    private List<SinhVien>sinhViens = new ArrayList<>();
+    private List<SinhVien> sinhViens = new ArrayList<>();
     private SinhVienService service = new SinhVienServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Lay ra duong dan tren trinh duyet
-        String uri = request.getRequestURI();
-        if (uri.contains("hien-thi")) {
-            // hien thi du lieu
-            this.hienThiSinhVien(request, response);
-        } else if (uri.contains("search")) {
-            // search du lieu
-            this.searchSinhVien(request, response);
-        } else if (uri.contains("remove")) {
-            // Remove du lieu
-            this.removeSinhVien(request, response);
-        } else if (uri.contains("detail")) {
-            // detail du lieu
-            this.detailSinhVien(request, response);
-        } else if (uri.contains("view-add")) {
-            // hien thi form add
-            this.viewAddSinhVien(request, response);
-        } else if (uri.contains("view-update")) {
-            // hien thi form update
-            this.viewUpdateSinhVien(request, response);
-        } else {
-            // neu khong vao cac case tren thi quay lai trang hien thi
-            this.hienThiSinhVien(request, response);
-        }
+//        HttpSession session = request.getSession();
+//        String username = (String) session.getAttribute("username1");
+//        if (username == null) {
+//            // chua dang nhap => chuyen sang trang dang nhap
+//            response.sendRedirect("/Login");
+//        } else {
+//            // Lay ra duong dan tren trinh duyet
+            String uri = request.getRequestURI();
+            if (uri.contains("hien-thi")) {
+                // hien thi du lieu
+                this.hienThiSinhVien(request, response);
+            } else if (uri.contains("search")) {
+                // search du lieu
+                this.searchSinhVien(request, response);
+            } else if (uri.contains("remove")) {
+                // Remove du lieu
+                this.removeSinhVien(request, response);
+            } else if (uri.contains("detail")) {
+                // detail du lieu
+                this.detailSinhVien(request, response);
+            } else if (uri.contains("view-add")) {
+                // hien thi form add
+                this.viewAddSinhVien(request, response);
+            } else if (uri.contains("view-update")) {
+                // hien thi form update
+                this.viewUpdateSinhVien(request, response);
+            } else {
+                // neu khong vao cac case tren thi quay lai trang hien thi
+                this.hienThiSinhVien(request, response);
+            }
+//        }
     }
 
     @Override
@@ -95,19 +103,19 @@ public class SinhVienServlet extends HttpServlet {
                 .tuoi(Integer.valueOf(tuoi))
                 .build();
         // B3: Add vao list
-        service.addSinhVien(sinhViens,sv);
+        service.addSinhVien(sinhViens, sv);
 
         // B4: Set gia tri va chuyen trang
-        request.setAttribute("listSV",sinhViens);
-        request.getRequestDispatcher("/buoi4/sinhviens.jsp").forward(request,response);
+        request.setAttribute("listSV", sinhViens);
+        request.getRequestDispatcher("/buoi4/sinhviens.jsp").forward(request, response);
     }
 
     private void viewUpdateSinhVien(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Lay du lieu jsp ve servlet
         String viTri = request.getParameter("id");
-        SinhVien sv = service.getOne(sinhViens,Integer.parseInt(viTri));
-        request.setAttribute("sinhVien",sv);
-        request.getRequestDispatcher("/buoi4/update-sinh-vien.jsp").forward(request,response);
+        SinhVien sv = service.getOne(sinhViens, Integer.parseInt(viTri));
+        request.setAttribute("sinhVien", sv);
+        request.getRequestDispatcher("/buoi4/update-sinh-vien.jsp").forward(request, response);
     }
 
     private void viewAddSinhVien(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -117,15 +125,15 @@ public class SinhVienServlet extends HttpServlet {
     private void detailSinhVien(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Lay du lieu jsp ve servlet
         String viTri = request.getParameter("id");
-        SinhVien sv = service.getOne(sinhViens,Integer.parseInt(viTri));
-        request.setAttribute("sinhVien",sv);
-        request.getRequestDispatcher("/buoi4/detail-sinh-vien.jsp").forward(request,response);
+        SinhVien sv = service.getOne(sinhViens, Integer.parseInt(viTri));
+        request.setAttribute("sinhVien", sv);
+        request.getRequestDispatcher("/buoi4/detail-sinh-vien.jsp").forward(request, response);
     }
 
     private void removeSinhVien(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Lay du lieu jsp ve servlet
         String viTri = request.getParameter("id1");
-        service.removeSinhVien(sinhViens,Integer.valueOf(viTri));
+        service.removeSinhVien(sinhViens, Integer.valueOf(viTri));
         // C1: Copy past ham hien thi
 //        if(sinhViens.isEmpty()){
 //            sinhViens = service.fakeData();
@@ -143,10 +151,10 @@ public class SinhVienServlet extends HttpServlet {
 
     private void hienThiSinhVien(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // fakedata
-        if(sinhViens.isEmpty()){
+        if (sinhViens.isEmpty()) {
             sinhViens = service.fakeData();
         }
-        request.setAttribute("listSV",sinhViens);
-        request.getRequestDispatcher("/buoi4/sinhviens.jsp").forward(request,response);
+        request.setAttribute("listSV", sinhViens);
+        request.getRequestDispatcher("/buoi4/sinhviens.jsp").forward(request, response);
     }
 }
